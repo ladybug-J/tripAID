@@ -34,15 +34,15 @@ if __name__ == "__main__":
     with col1:
         location = st.text_input(
             "Where do you want to travel?",
-            value=None
+            value="Berlin"
         )
         start_date = st.date_input(
             "Start date:",
-            value=datetime.date(2025, 6, 2)
+            value=datetime.datetime.now()
         )
         end_date = st.date_input(
                 "End date:",
-                value=datetime.date(2025, 6, 4)
+                value=datetime.datetime.now()+datetime.timedelta(days=2)
             )
 
         nr_days = (end_date-start_date).days
