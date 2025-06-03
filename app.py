@@ -9,7 +9,7 @@ from weather import get_weather_forecast_or_history
 from retrieve import get_image
 
 st.set_page_config(
-        page_title="TripAid",
+        page_title="tripAID",
         page_icon=":ferris_wheel:",
         layout="wide"
 )
