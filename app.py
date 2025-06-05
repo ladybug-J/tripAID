@@ -59,15 +59,16 @@ if __name__ == "__main__":
             except:
                 st.error("Invalid API key. Please try again.")
 
-    llm = ChatTogether(
-        model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
-        temperature=0.7,
-        max_tokens=None,
-        max_retries=2,
-        api_key=st.session_state.api_key
-    )
-
     if st.session_state.valid_key:
+
+        llm = ChatTogether(
+            model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+            temperature=0.7,
+            max_tokens=None,
+            max_retries=2,
+            api_key=st.session_state.api_key
+        )
+
         col1, col2 = st.columns([3,1])
 
         with col1:
