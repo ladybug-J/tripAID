@@ -1,16 +1,12 @@
 from langchain.tools import Tool
 import openmeteo_requests
+import copy
 import requests
 import datetime
 import dateparser
+from typing import *
 
-def get_coordinates(location: str):
-    geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={location}&count=1"
-    geo_res = requests.get(geo_url).json()
-    if "results" not in geo_res:
-        return None, None
-    loc = geo_res["results"][0]
-    return loc["latitude"], loc["longitude"]
+from location import get_coordinates
 
 def parse_date(date_str: str):
     parsed_date = dateparser.parse(date_str)
@@ -19,7 +15,10 @@ def parse_date(date_str: str):
 
     return parsed_date.date()
 
-def get_weather_forecast_or_history(location: str, target_date: datetime.datetime):
+def get_weather_forecast_or_history(
+        location: str,
+        target_date: datetime.datetime
+):
 
     lat, lon = get_coordinates(location)
 
@@ -44,11 +43,8 @@ def get_weather_forecast_or_history(location: str, target_date: datetime.datetim
             t_max = res["daily"]["temperature_2m_max"][idx]
             t_min = res["daily"]["temperature_2m_min"][idx]
             rain = res["daily"]["precipitation_sum"][idx]
-            return {
-                target_date:
-                f"Temperature Max: {t_max}°C, Min: {t_min}°C\n"
-                f"Rain: {rain} mm"
-            }
+            return f"Temperature Max: {t_max}°C, Min: {t_min}°C - Rain: {rain} mm"
+
         except ValueError:
             print(f"⚠️ Forecast for {target_date} not available yet. Calling historic data...")
 
@@ -69,8 +65,17 @@ def get_weather_forecast_or_history(location: str, target_date: datetime.datetim
         t_min = res["daily"]["temperature_2m_min"][0]
         rain = res["daily"]["precipitation_sum"][0]
 
-        return {
-            target_date:
-            f"Temperature Max: {t_max}°C, Min: {t_min}°C\n"
-            f"Rain: {rain} mm"
-        }
+        return f"Temperature Max: {t_max}°C, Min: {t_min}°C - Rain: {rain} mm"
+
+
+def return_weather_dict(cities: Dict[str, int], start_date: datetime.datetime):
+    weather_dict = {}
+    date = copy.deepcopy(start_date)
+    for city, days in cities.items():
+        for day in range(int(days)):
+            key = city + "_" + date.strftime("%Y-%m-%d") # Combine city and date in key
+            weather_dict[key] = get_weather_forecast_or_history(city, date)
+            date += datetime.timedelta(days=1)
+
+    return weather_dict
+
